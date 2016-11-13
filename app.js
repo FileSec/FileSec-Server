@@ -19,7 +19,7 @@ io.on('connection', function(socket) {
 		var index = -1;
 		for(var i = 0; i <connections[userID].length;i++){
 			var connection = connections[userID][i];
-			if(connect.socket.id == socket.id){
+			if(connection.socket.id == socket.id){
 				index = i;
 				break;
 			}
@@ -31,7 +31,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('user.auth', function(message) {
-		console.log('User connected', message.userID);
+		console.log('User connected', message.userID, message.deviceType	);
 		if(!(message.userID in connections)) {
 			connections[message.userID] = []
 		}
@@ -48,8 +48,8 @@ io.on('connection', function(socket) {
 		connections[userID].forEach(function(connection) {
 			if(connection.deviceType == "mobile")
 			{
-				files[userID] = params.files
-				pins[userID] = params.pin
+				files[userID] = params.file;
+				pins[userID] = params.pin;
 				connection.socket.emit("pin.request", params);
 				return;
 			}
@@ -71,11 +71,12 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('key.send',function(params){
+		console.log('key send was handled');
 		var userID = users[socket.id];
 		connections[userID].forEach(function(connection){
 			if(connection.deviceType == "computer"){
 				console.log('User requested a key to be passed', userID);
-				connection.socket.emit("key.send",params.key);
+				connection.socket.emit("key.send",params);
 				return;
 			}
 		})
